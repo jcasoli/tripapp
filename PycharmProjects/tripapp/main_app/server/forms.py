@@ -1,7 +1,7 @@
 from flask_wtf import Form
 
 import server.models as models
-from wtforms import StringField, PasswordField
+from wtforms import StringField, PasswordField, TextAreaField
 from wtforms.validators import (DataRequired, Regexp, ValidationError, Email,
                                 Length, EqualTo)
 def name_exists(form, field):
@@ -47,3 +47,10 @@ class RegisterForm(Form):
             DataRequired()
         ]
     )
+
+class LoginForm(Form):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = StringField('Password', validators=[DataRequired()])
+
+class PostForm(Form):
+    content = TextAreaField("What's Up?", validators=[DataRequired()])
