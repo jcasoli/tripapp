@@ -88,6 +88,6 @@ class Relationship(Model):
 
 
 def initialize():
-    DATABASE.connect()
+    DATABASE.get_conn()
     DATABASE.create_tables([User, Post, Relationship], safe=True)
     DATABASE.close()
