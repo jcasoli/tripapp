@@ -67,6 +67,10 @@ class Post(Model):
         related_name='posts'
     )
     content = TextField()
+    header_image = CharField()
+    title = TextField()
+
+
 
     class Meta:
         database = DATABASE
@@ -79,7 +83,7 @@ class Relationship(Model):
     class Meta:
         database = DATABASE
         indexes = (
-            (('from_user', 'to_user'), True)
+            (('from_user','to_user'), True),
         )
 
 

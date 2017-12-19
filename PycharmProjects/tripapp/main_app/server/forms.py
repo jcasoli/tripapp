@@ -1,7 +1,7 @@
 from flask_wtf import Form
 
 import server.models as models
-from wtforms import StringField, PasswordField, TextAreaField
+from wtforms import StringField, PasswordField, TextAreaField, FileField
 from wtforms.validators import (DataRequired, Regexp, ValidationError, Email,
                                 Length, EqualTo)
 def name_exists(form, field):
@@ -53,4 +53,8 @@ class LoginForm(Form):
     password = StringField('Password', validators=[DataRequired()])
 
 class PostForm(Form):
-    content = TextAreaField("What's Up?", validators=[DataRequired()])
+    title = TextAreaField("Title of Your Trip", validators=[DataRequired()])
+    header_image = FileField("Header Image", validators=[DataRequired()])
+    content = TextAreaField("Trip Description", validators=[DataRequired()])
+
+

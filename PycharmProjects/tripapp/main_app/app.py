@@ -2,6 +2,8 @@ from flask import (Flask, g, render_template, flash, redirect, url_for)
 from flask_login import (LoginManager, login_user, logout_user, login_required,
                          current_user)
 from flask_bcrypt import check_password_hash
+from werkzeug.utils import secure_filename
+import os
 
 import server.forms as forms
 import server.models as models
@@ -10,8 +12,14 @@ DEBUG = True
 PORT = 8000
 HOST = '0.0.0.0'
 
+APP_ROUTE = os.path.dirname(os.path.abspath(__file__))
+print(APP_ROUTE)
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
 app = Flask(__name__)
 app.secret_key = 'sdrldskfj.lsdifjdslk.34.slkfjdslkjf.adkfj!'
+app.config['UPLOAD_FOLDER'] = os.path.join(APP_ROUTE, 'static/img/user')
+app.config['IMG_FOLDER'] = 'img/user'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -80,8 +88,16 @@ def logout():
 def post():
     form = forms.PostForm()
     if form.validate_on_submit():
+        fileName = secure_filename(form.header_image.data.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], fileName)
+        if not os.path.isdir(app.config['UPLOAD_FOLDER']):
+            os.mkdir(app.config['UPLOAD_FOLDER'])
+        form.header_image.data.save(file_path)
         models.Post.create(user=g.user.id,
-                           content=form.content.data.strip())
+                           content=form.content.data.strip(),
+                           header_image=os.path.join(app.config['IMG_FOLDER'], fileName),
+                           title=form.title.data.strip()
+                           )
         flash("Message posted! Thanks!", "success")
         return redirect(url_for('index'))
     return render_template('post.html', form=form)
@@ -105,6 +121,11 @@ def stream(username=None):
     if username:
         template = 'user_stream.html'
     return render_template(template, stream=stream, user=user)
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 if __name__ == '__main__':
