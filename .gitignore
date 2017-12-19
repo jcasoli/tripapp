@@ -1,0 +1,4 @@
+flask_env
+main_app/__pycache__/
+main_app/server/__pycache__/
+.idea
