@@ -80,7 +80,7 @@ def logout():
 def post():
     form = forms.PostForm()
     if form.validate_on_submit():
-        models.Post.create(user=g.user._get_current_object(),
+        models.Post.create(user=g.user.id,
                            content=form.content.data.strip())
         flash("Message posted! Thanks!", "success")
         return redirect(url_for('index'))
@@ -88,7 +88,24 @@ def post():
 
 @app.route('/')
 def index():
-    return 'hey'
+    stream = models.Post.select().limit(100)
+    return render_template('stream.html', stream=stream)
+
+
+@app.route('/stream')
+@app.route('/stream/<username>')
+def stream(username=None):
+    template = 'stream.html'
+    if username and username != current_user.username:
+        user = models.User.select().where(models.User.username**username).get()
+        stream = user.posts.limit(100)
+    else:
+        stream = current_user.get_stream().limit(100)
+        user = current_user
+    if username:
+        template = 'user_stream.html'
+    return render_template(template, stream=stream, user=user)
+
 
 if __name__ == '__main__':
     models.initialize()
